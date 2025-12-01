@@ -13,10 +13,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/**
+ * Unit tests for {@link VotingService}.
+ *
+ * <p>These tests verify the core business rules for validating shareholder votes:</p>
+ * <ul>
+ *     <li>Invalid proposals cause an {@link InvalidProposalException}.</li>
+ *     <li>New votes are always accepted.</li>
+ *     <li>Vote changes after the record date are rejected.</li>
+ *     <li>Vote changes before the record date are accepted.</li>
+ * </ul>
+ *
+ * @author Konstantinos Karavitis
+ */
 class VotingServiceTest {
 
     private VotingService votingService;
 
+    /**
+     * Verifies that when a vote references a proposal that is not valid
+     * for the given meeting, the service throws {@link InvalidProposalException}.
+     */
     @Test
     void invalidProposalShouldThrowInvalidProposalException() {
         // given
@@ -32,11 +49,15 @@ class VotingServiceTest {
         Vote vote = new Vote("shareHolderId", meetingId, proposalId);
         LocalDate recordDate = LocalDate.now();
 
-        // then
+        // when and then
         assertThrows(InvalidProposalException.class, () ->
               votingService.processVote(vote, new HashSet<>(), recordDate));
     }
 
+    /**
+     * Verifies that a new vote (from a shareholder who has not voted before)
+     * is always accepted.
+     */
     @Test
     void newVoteIsAlwaysAccepted() throws InvalidProposalException {
         // given
@@ -61,6 +82,10 @@ class VotingServiceTest {
         assertTrue(result);
     }
 
+    /**
+     * Verifies that when a shareholder has already voted and the current date
+     * is after the record date, an attempt to change the vote is rejected.
+     */
     @Test
     void voteChangesAfterRecordDateAreRejected() throws InvalidProposalException {
         // given
@@ -86,6 +111,10 @@ class VotingServiceTest {
         assertFalse(result);
     }
 
+    /**
+     * Verifies that when a shareholder has already voted and the current date
+     * is before the record date, an attempt to change the vote is accepted.
+     */
     @Test
     void voteCanBeChangedWhenCurrentDateIsBeforeRecordDate() throws InvalidProposalException {
         // given

@@ -6,6 +6,8 @@ import java.util.Set;
 
 /**
  * In-memory implementation of {@link MeetingProposalsRepository} backed by a {@link Map}.
+ *
+ * @author Konstantinos Karavitis
  */
 public class InMemoryMeetingProposalsRepository implements MeetingProposalsRepository {
 
